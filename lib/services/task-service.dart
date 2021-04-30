@@ -1,14 +1,18 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:kiwi_mobile/model/dto/task-dto.dart';
 
 
 class TaskService {
-  var REST_API_IP = 'http://192.168.0.18:10080/rest/task';
+  var REST_API_IP = 'http://10.0.2.2:10080/rest/task';
 
   var _dio = Dio();
 
-  Future<String?> getListOfTasks(String jwt) async {
-    var response = await _dio.get('$REST_API_IP');
-    response.headers.add("Authentication", "Bearer $jwt");
-    return response.data;
+  Future<TaskDto?> getListOfTasks(String jwt) async {
+    _dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer $jwt";
+    var response = await _dio.get('http://10.0.2.2:10080/rest/task');
+    return TaskDto.fromJson(response.data);
   }
 }
