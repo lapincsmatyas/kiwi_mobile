@@ -12,7 +12,6 @@ class Task {
 
   Task(this.id, this.code, this.description, this.taskStatus, this.taskType);
 
-
   dynamic toJson() => _$TaskToJson(this);
   factory Task.fromJson(Map<String, dynamic> obj) => _$TaskFromJson(obj);
 }

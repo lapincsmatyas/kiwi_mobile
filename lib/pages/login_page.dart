@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kiwi_mobile/model/jwt.dart';
 import 'package:kiwi_mobile/pages/list_page.dart';
 import 'package:kiwi_mobile/services/login-service.dart';
 
@@ -42,7 +43,7 @@ class LoginPage extends StatelessWidget {
                     var username = _userNameController.text;
                     var password = _passwordController.text;
 
-                    var jwt =
+                    String? jwt =
                         await _loginService.attemptLogin(username, password);
                     if (jwt != null) {
                       storage.write(key: "jwt", value: jwt);
