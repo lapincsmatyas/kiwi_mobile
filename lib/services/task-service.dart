@@ -4,8 +4,12 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:kiwi_mobile/model/dto/task-dto.dart';
 
+import 'login-service.dart';
+
 
 class TaskService {
+  final _loginService = LoginService();
+
   var REST_API_IP = 'http://10.0.2.2:10080/rest';
 
   var _dio = Dio();

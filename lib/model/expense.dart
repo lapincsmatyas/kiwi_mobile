@@ -4,9 +4,9 @@ part 'expense.g.dart';
 
 @JsonSerializable()
 class Expense {
-  final String? descripion;
+  String? description;
 
-  Expense(this.descripion);
+  Expense({this.description = ""});
 
   dynamic toJson() => _$ExpenseToJson(this);
   factory Expense.fromJson(Map<String, dynamic> obj) => _$ExpenseFromJson(obj);
