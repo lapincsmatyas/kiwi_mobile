@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:kiwi_mobile/model/dto/task-dto.dart';
+import 'package:kiwi_mobile/model/task.dart';
 
 import 'login-service.dart';
 
@@ -14,9 +15,10 @@ class TaskService {
 
   var _dio = Dio();
 
-  Future<TaskDto?> getListOfTasks(String? jwt) async {
+  Future<List<Task>?> getListOfTasks(String? jwt) async {
     _dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer $jwt";
     var response = await _dio.get('$REST_API_IP/task');
-    return TaskDto.fromJson(response.data);
+    TaskDto? taskDto = TaskDto.fromJson(response.data);
+    return taskDto.data;
   }
 }

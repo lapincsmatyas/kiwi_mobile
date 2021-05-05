@@ -27,8 +27,8 @@ class LoginService {
     };
     var response = await _dio.post('$_AUTH_IP',
         data: body,
-        options: Dio.Options(contentType: Dio.Headers.formUrlEncodedContentType)
-    );
+        options:
+            Dio.Options(contentType: Dio.Headers.formUrlEncodedContentType));
 
     if (response.statusCode == 200) {
       JWT deserialized = JWT.fromJson(response.data);
@@ -38,7 +38,7 @@ class LoginService {
     return null;
   }
 
-  void logout(){
+  void logout() {
     storage.delete(key: "jwt");
   }
 }

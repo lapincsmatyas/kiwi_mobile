@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kiwi_mobile/model/jwt.dart';
-import 'package:kiwi_mobile/pages/list_page.dart';
+import 'package:kiwi_mobile/pages/list_page/list_page.dart';
 import 'package:kiwi_mobile/services/login-service.dart';
 
 class LoginPage extends StatelessWidget {
@@ -50,7 +49,8 @@ class LoginPage extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ListPage(jwt)),
+                              builder: (context) =>
+                                  ListPage(jwt)),
                           (r) => false
                       );
                     }

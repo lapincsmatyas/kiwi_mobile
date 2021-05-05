@@ -1,15 +1,16 @@
 import 'dart:developer';
-import 'dart:convert'; //Don't forget to import this
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kiwi_mobile/model/consultation-list.dart';
 import 'package:kiwi_mobile/model/consultation.dart';
 import 'package:kiwi_mobile/model/expense.dart';
+import 'package:kiwi_mobile/model/task-list.dart';
 import 'package:kiwi_mobile/model/task.dart';
-import 'package:kiwi_mobile/pages/consultation-creation/consultation_creation_form.dart';
+import 'package:kiwi_mobile/pages/consultation_creation/consultation_creation_form.dart';
 import 'package:kiwi_mobile/services/consultation-service.dart';
 import 'package:kiwi_mobile/services/login-service.dart';
+import 'package:provider/provider.dart';
+
 
 import '../login_page.dart';
 
@@ -57,12 +58,18 @@ class ConsultationCreationPage extends StatelessWidget {
         body: ConsultationCreationForm(
             consultation!,
           onSubmitted: (Consultation consultation) async {
-
             try {
-              var result = await this._consultationService.createConsultation(
-                  jwt, consultation);
-              log(result);
-              Navigator.pop(context);
+              Consultation? result = await this._consultationService.createConsultation(jwt, consultation);
+              if(result != null) {
+                var consultationList = context.read<ConsultationList>();
+                consultationList.add(result);
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text("Sikeres rögzítés!")));
+                Navigator.pop(context);
+              } else {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text("Nem sikerült a konzultáció létrehozása!")));
+              }
             } catch (err) {
               log(err.toString());
             }

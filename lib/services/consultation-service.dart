@@ -6,6 +6,7 @@ import 'package:dio/dio.dart' as Dio;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kiwi_mobile/model/consultation.dart';
 import 'package:kiwi_mobile/model/dto/consultation-creation-dto.dart';
+import 'package:kiwi_mobile/model/dto/consultation-creation-response-dto.dart';
 import 'package:kiwi_mobile/model/dto/consultation-dto.dart';
 import 'package:kiwi_mobile/model/dto/filter-dto.dart';
 import 'package:kiwi_mobile/model/task.dart';
@@ -30,7 +31,7 @@ class ConsultationService {
     return consultations;
   }
 
-  Future<Null> createConsultation(
+  Future<Consultation?> createConsultation(
       String? jwt, Consultation consultation) async {
     _dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer $jwt";
     ConsultationCreationDto consultationCreationDto =
@@ -48,6 +49,11 @@ class ConsultationService {
 
     var response = await _dio.put('$REST_API_IP/consultation',
         data: consultationCreationDto.toJson());
-    return;
+    ConsultationCreationResponseDto consultationCreationResponseDto = ConsultationCreationResponseDto.fromJson(response.data);
+    if (consultationCreationResponseDto.successful != null && consultationCreationResponseDto.successful == true){
+      return consultation;
+    } else {
+      return null;
+    }
   }
 }
