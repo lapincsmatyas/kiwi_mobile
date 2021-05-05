@@ -11,9 +11,7 @@ import 'package:kiwi_mobile/services/consultation-service.dart';
 import 'package:kiwi_mobile/services/login-service.dart';
 import 'package:provider/provider.dart';
 
-
 import '../login_page.dart';
-
 
 class ConsultationCreationPage extends StatelessWidget {
   final _loginService = LoginService();
@@ -21,27 +19,33 @@ class ConsultationCreationPage extends StatelessWidget {
   final Task? task;
   Consultation? consultation;
   String? jwt;
+  bool create = true;
 
-  ConsultationCreationPage(this.jwt, {Key? key, Consultation? consultation, this.task}) :  super(key: key) {
-   if(consultation == null){
-     this.consultation = new Consultation(
-         id: "1",
-         startDate: DateTime.now().millisecondsSinceEpoch,
-         duration: 60,
-         allDay: false,
-         description: "",
-         taskDTO: this.task,
-         expensesDTO: List.filled(1, new Expense()));
-   } else {
-     this.consultation = consultation;
-   }
+  ConsultationCreationPage(this.jwt,
+      {Key? key, Consultation? consultation, this.task})
+      : super(key: key) {
+    if (consultation == null) {
+      this.consultation = new Consultation(
+          id: "1",
+          startDate: DateTime.now().millisecondsSinceEpoch,
+          duration: 60,
+          allDay: false,
+          description: "",
+          taskDTO: this.task,
+          expensesDTO: List.filled(1, new Expense()));
+    } else {
+      this.create = false;
+      this.consultation = consultation;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(this.consultation != null ? "Konzultáció szerkesztése" : "Konzultáció rögzítése"),
+          title: Text(this.consultation != null
+              ? "Konzultáció szerkesztése"
+              : "Konzultáció rögzítése"),
           actions: <Widget>[
             IconButton(
                 icon: Icon(Icons.logout),
@@ -51,31 +55,35 @@ class ConsultationCreationPage extends StatelessWidget {
                   Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (context) => LoginPage()),
-                          (r) => false);
+                      (r) => false);
                 })
           ],
         ),
-        body: ConsultationCreationForm(
-            consultation!,
-          onSubmitted: (Consultation consultation) async {
-            try {
-              Consultation? result = await this._consultationService.createConsultation(jwt, consultation);
-              if(result != null) {
-                var consultationList = context.read<ConsultationList>();
+        body: ConsultationCreationForm(consultation!,
+            onSubmitted: (Consultation consultation) async {
+          try {
+            var consultationList = context.read<ConsultationList>();
+            Consultation? result = this.create
+                ? await this._consultationService.createConsultation(jwt, consultation)
+                : await this._consultationService.updateConsultation(jwt, consultation);
+            if (result == null) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text("Hiba történt!")));
+            } else {
+              if (this.create) {
                 consultationList.add(result);
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text("Sikeres rögzítés!")));
-                Navigator.pop(context);
               } else {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text("Nem sikerült a konzultáció létrehozása!")));
+                consultationList.update(result);
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Sikeres módosítás!")));
               }
-            } catch (err) {
-              log(err.toString());
             }
+            Navigator.pop(context);
+          } catch (err) {
+            log(err.toString());
           }
-
-        )
-    );
+        }));
   }
 }

@@ -56,4 +56,40 @@ class ConsultationService {
       return null;
     }
   }
+
+  Future<Consultation?> updateConsultation(String? jwt, Consultation consultation) async {
+    _dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer $jwt";
+
+    ConsultationCreationDto consultationCreationDto =
+    new ConsultationCreationDto(
+        consultation.id,
+        consultation.startDate,
+        consultation.duration,
+        consultation.allDay,
+        consultation.description,
+        consultation.taskDTO!.id,
+        consultation.expensesDTO);
+
+    var response = await _dio.post('$REST_API_IP/consultation/update',
+        data: consultationCreationDto.toJson());
+
+    ConsultationCreationResponseDto consultationCreationResponseDto = ConsultationCreationResponseDto.fromJson(response.data);
+    if (consultationCreationResponseDto.successful != null && consultationCreationResponseDto.successful == true){
+      return consultation;
+    } else {
+      return null;
+    }
+  }
+
+  Future<String?> deleteConsultation(String? jwt, Consultation consultation) async {
+    _dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer $jwt";
+
+    var response = await _dio.delete('$REST_API_IP/consultation/${consultation.id}');
+    ConsultationCreationResponseDto consultationCreationResponseDto = ConsultationCreationResponseDto.fromJson(response.data);
+    if (consultationCreationResponseDto.successful != null && consultationCreationResponseDto.successful == true){
+      return consultation.id;
+    } else {
+      return null;
+    }
+  }
 }

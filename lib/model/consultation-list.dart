@@ -16,6 +16,7 @@ class ConsultationList extends ChangeNotifier{
     } else {
       this.consultations = List.empty();
     }
+    notifyListeners();
   }
 
   void setTask(List<Consultation>? consultations){
@@ -37,8 +38,14 @@ class ConsultationList extends ChangeNotifier{
     notifyListeners();
   }
 
+  void update(Consultation consultation){
+    consultations[consultations.indexWhere((element) => element.id == consultation.id)] = consultation;
+    notifyListeners();
+  }
+
   void removeById(String id){
     this.consultations.removeWhere((element) => element.id == id);
+    notifyListeners();
   }
 
   dynamic toJson() => _$ConsultationListToJson(this);
