@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kiwi_mobile/pages/list_page/list_page.dart';
+import 'package:kiwi_mobile/pages/task_list_page/task_list_page.dart';
 import 'package:kiwi_mobile/services/login-service.dart';
 
 class LoginPage extends StatelessWidget {
@@ -50,7 +50,7 @@ class LoginPage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  ListPage(jwt)),
+                                  TaskListPage(jwt)),
                           (r) => false
                       );
                     }

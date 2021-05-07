@@ -1,11 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kiwi_mobile/model/consultation.dart';
+import 'package:kiwi_mobile/model/task-list.dart';
 import 'package:kiwi_mobile/model/task.dart';
+import 'package:provider/provider.dart';
 
 class ConsultationCreationForm extends StatefulWidget {
   Consultation consultation;
-  Task? task;
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
   Function(Consultation consultation) onSubmitted;
@@ -23,6 +26,9 @@ class ConsultationCreationForm extends StatefulWidget {
 }
 
 class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime;
+
   final _formKey = GlobalKey<FormState>();
 
   Future<Null> _selectDate(BuildContext context) async {
@@ -58,6 +64,8 @@ class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
 
   @override
   Widget build(BuildContext context) {
+    TaskList taskList = context.watch<TaskList>();
+
     return Container(
         padding: const EdgeInsets.all(10.0),
         child: Form(
@@ -66,15 +74,32 @@ class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("Taszk kód"),
-              TextFormField(
-                initialValue: widget.consultation.taskDTO?.code,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Töltsd ki a mezőt!";
-                  }
-                },
-                enabled: false,
-              ),
+              Row(children: [
+                Expanded(
+                    child: DropdownButtonFormField<Task>(
+                        isExpanded: true,
+                        value: widget.consultation.taskDTO,
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Válassz taszkot!';
+                          }
+                          return null;
+                        },
+                        items: taskList.tasks
+                            .map((task) => new DropdownMenuItem<Task>(
+                                value: task,
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [Text(task.code!)])))
+                            .toList(),
+                        onChanged: (value) => {
+                              setState(() {
+                                widget.consultation.taskDTO = value;
+                              })
+                            }))
+              ]),
               Text("Kezdés"),
               Row(
                 children: [
@@ -136,6 +161,21 @@ class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
               ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
+                      var selectedDate = widget.selectedDate;
+                      var selectedTime = widget.selectedTime;
+                      DateTime date;
+                      if (selectedDate != null && selectedTime != null) {
+                        date = new DateTime(
+                            selectedDate.year,
+                            selectedDate.month,
+                            selectedDate.day,
+                            selectedTime.hour,
+                            selectedTime.minute);
+                      } else {
+                        date = DateTime.now();
+                      }
+                      Consultation consultation = widget.consultation;
+                      consultation.startDate = date.millisecondsSinceEpoch;
                       widget.onSubmitted(widget.consultation);
                     }
                   },

@@ -45,12 +45,11 @@ class ConsultationService {
             consultation.expensesDTO);
 
     const JsonEncoder encoder = JsonEncoder.withIndent('  ');
-    log(encoder.convert(consultationCreationDto.toJson()));
-
     var response = await _dio.put('$REST_API_IP/consultation',
         data: consultationCreationDto.toJson());
     ConsultationCreationResponseDto consultationCreationResponseDto = ConsultationCreationResponseDto.fromJson(response.data);
     if (consultationCreationResponseDto.successful != null && consultationCreationResponseDto.successful == true){
+      consultation.id = consultationCreationResponseDto.data;
       return consultation;
     } else {
       return null;

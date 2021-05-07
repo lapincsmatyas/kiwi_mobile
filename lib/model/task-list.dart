@@ -6,23 +6,22 @@ part 'task-list.g.dart';
 
 @JsonSerializable()
 class TaskList extends ChangeNotifier{
-  List<Task> tasks = List.empty();
+  List<Task> tasks = [];
 
   TaskList({List<Task>? tasks}){
     if(tasks != null){
       this.tasks = tasks;
     } else {
-      this.tasks = List.empty();
+      this.tasks = [];
     }
   }
 
-  void setTask(List<Task>? taskList){
+  void setTasks(List<Task>? taskList){
     if(taskList != null){
       tasks = taskList;
     } else {
-      tasks = List.empty();
+      tasks = [];
     }
-    notifyListeners();
   }
 
   void add(Task task){

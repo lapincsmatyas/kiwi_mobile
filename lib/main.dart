@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kiwi_mobile/pages/list_page/list_page.dart';
+import 'package:kiwi_mobile/pages/task_list_page/task_list_page.dart';
 import 'package:kiwi_mobile/services/login-service.dart';
 
 import 'pages/login_page.dart';
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
           builder: (context, snapshot) {
             if (!snapshot.hasData) return CircularProgressIndicator();
             if (snapshot.data != "") {
-              return ListPage(snapshot.data.toString());
+              return TaskListPage(snapshot.data.toString());
             } else {
               return LoginPage();
             }

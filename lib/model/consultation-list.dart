@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:kiwi_mobile/model/task.dart';
 
 import 'consultation.dart';
 
@@ -14,16 +13,15 @@ class ConsultationList extends ChangeNotifier{
     if(consultations != null){
       this.consultations = consultations;
     } else {
-      this.consultations = List.empty();
+      this.consultations = [];
     }
-    notifyListeners();
   }
 
-  void setTask(List<Consultation>? consultations){
+  void setConsultations(List<Consultation>? consultations){
     if(consultations != null){
-      consultations = consultations;
+      this.consultations = consultations;
     } else {
-      consultations = List.empty();
+      this.consultations = [];
     }
     notifyListeners();
   }

@@ -40,18 +40,22 @@ class TaskListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     var task =
         context.select<TaskList, Task>((taskList) => taskList.tasks[index]);
-    return TextButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => TaskDetailsPage(this._jwt, task)));
-        },
-        child: Container(
-            padding: new EdgeInsets.all(10.0),
-            color: new Color(0xecf0f1),
-            height: 50,
-            alignment: Alignment.centerLeft,
-            child: Text(task.code!)));
+    var taskList = context.read<TaskList>();
+
+    return Card(
+      child: ListTile(
+        title: TextButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ChangeNotifierProvider<TaskList>.value(
+                              value: taskList,
+                              child: TaskDetailsPage(this._jwt, task))));
+            },
+            child: Container(alignment: Alignment.centerLeft, child: Text(task.code!))),
+      ),
+    );
   }
 }

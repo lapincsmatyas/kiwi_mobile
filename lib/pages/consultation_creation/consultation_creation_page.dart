@@ -17,16 +17,18 @@ class ConsultationCreationPage extends StatelessWidget {
   final _loginService = LoginService();
   final _consultationService = ConsultationService();
   final Task? task;
+  String? originalTaskId;
   Consultation? consultation;
   String? jwt;
   bool create = true;
+
 
   ConsultationCreationPage(this.jwt,
       {Key? key, Consultation? consultation, this.task})
       : super(key: key) {
     if (consultation == null) {
       this.consultation = new Consultation(
-          id: "1",
+          id: null,
           startDate: DateTime.now().millisecondsSinceEpoch,
           duration: 60,
           allDay: false,
@@ -34,6 +36,7 @@ class ConsultationCreationPage extends StatelessWidget {
           taskDTO: this.task,
           expensesDTO: List.filled(1, new Expense()));
     } else {
+      this.originalTaskId = consultation.taskDTO?.id;
       this.create = false;
       this.consultation = consultation;
     }
@@ -41,9 +44,11 @@ class ConsultationCreationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ConsultationList consultationList = context.watch<ConsultationList>();
+
     return Scaffold(
         appBar: AppBar(
-          title: Text(this.consultation != null
+          title: Text(this.consultation?.id != null
               ? "Konzultáció szerkesztése"
               : "Konzultáció rögzítése"),
           actions: <Widget>[
@@ -59,10 +64,9 @@ class ConsultationCreationPage extends StatelessWidget {
                 })
           ],
         ),
-        body: ConsultationCreationForm(consultation!,
+        body: ConsultationCreationForm(this.consultation!,
             onSubmitted: (Consultation consultation) async {
           try {
-            var consultationList = context.read<ConsultationList>();
             Consultation? result = this.create
                 ? await this._consultationService.createConsultation(jwt, consultation)
                 : await this._consultationService.updateConsultation(jwt, consultation);
@@ -71,11 +75,15 @@ class ConsultationCreationPage extends StatelessWidget {
                   .showSnackBar(SnackBar(content: Text("Hiba történt!")));
             } else {
               if (this.create) {
-                consultationList.add(result);
+                if(result.taskDTO?.id == this.task?.id) {
+                  consultationList.add(result);
+                }
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text("Sikeres rögzítés!")));
               } else {
-                consultationList.update(result);
+                if(result.taskDTO?.id != this.originalTaskId){
+                  consultationList.removeById(result.id!);
+                }
                 ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Sikeres módosítás!")));
               }
