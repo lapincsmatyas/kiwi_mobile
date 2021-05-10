@@ -18,15 +18,15 @@ class Consultation {
 
   Consultation(
       {this.id,
-      startDate,
-      duration,
-      allDay,
+      int? startDate,
+      int? duration,
+      bool? allDay,
       this.description,
       this.taskDTO,
-      expensesDTO}) :
+      List<Expense>? expensesDTO}) :
         startDate = startDate ?? DateTime.now().millisecondsSinceEpoch,
         allDay = allDay ?? false,
-        expensesDTO = expensesDTO  ?? [],
+        expensesDTO = expensesDTO  ?? [Expense()],
         duration = duration ?? 60;
 
   dynamic toJson() => _$ConsultationToJson(this);

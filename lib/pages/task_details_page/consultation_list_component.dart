@@ -29,31 +29,30 @@ class _ConsultationListComponentState extends State<ConsultationListComponent> {
       return Text("Nincs rögzített konzultáció ehhez a taszkhoz");
     }
 
-    return
-      ListView.builder(
-          itemCount: consultationList.consultations.length,
-          itemBuilder: (context, index) {
-            return ConsultationListItem(
-                widget.jwt, consultationList.consultations[index],
-                onPressed: (consultation) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          MultiProvider(
-                              providers: [
-                                ChangeNotifierProvider<ConsultationList>.value(
-                                    value: consultationList)
-                              ],
-                              child: ConsultationCreationPage(taskList.tasks, widget.jwt, consultation)),
-                    ),);
-                }, onDismissed: (direction, consultation) {
-              consultationList.removeById(consultation.id!);
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text("Konzultáció törölve")));
-            });
-          }
-      );
+    return ListView.builder(
+        itemCount: consultationList.consultations.length,
+        itemBuilder: (context, index) {
+          return ConsultationListItem(
+              widget.jwt, consultationList.consultations[index],
+              onPressed: (consultation) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MultiProvider(
+                    providers: [
+                      ChangeNotifierProvider<ConsultationList>.value(
+                          value: consultationList)
+                    ],
+                    child: ConsultationCreationPage(
+                        taskList.tasks, widget.jwt, consultation)),
+              ),
+            );
+          }, onDismissed: (direction, consultation) {
+            consultationList.removeById(consultation.id!);
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text("Konzultáció törölve")));
+          });
+        });
   }
 }
 
@@ -97,56 +96,48 @@ class ConsultationListItem extends StatelessWidget {
             ),
           ),
           child: TextButton(
-          onPressed: () {
-    this.onPressed(consultation);
-    },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            children: [
-              Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            onPressed: () {
+              this.onPressed(consultation);
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Container(
+                      child: Text(
+                        consultation.description ??
+                            "wetwert wet wet wet wet wet wert wet wert ",
+                        style: TextStyle(fontSize: 20),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Container(
-                      child: Text(consultation.id!.substring(0, 10),
-                          style: DefaultTextStyle
-                              .of(context)
-                              .style),
+                      child: Builder(builder: (context) {
+                        var date = DateTime.fromMillisecondsSinceEpoch(
+                            consultation.startDate);
+                        var day = "${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}.";
+                        var time = "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
+                        return Text("${day}${consultation.allDay ? "" : " " + time}",
+                            style: DefaultTextStyle.of(context).style);
+                      }),
                     ),
                     Container(
-                      child: Text(consultation.description!,
-                          style: DefaultTextStyle
-                              .of(context)
-                              .style),
-                    ),
-                  ])
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                child: Text(
-                    new DateTime.fromMillisecondsSinceEpoch(
-                        consultation.startDate)
-                        .toString(),
-                    style: DefaultTextStyle
-                        .of(context)
-                        .style),
-              ),
-              Container(
-                child: Text(
-                    "Hossz: ${(consultation.duration / 60).toString()} óra",
-                    style: DefaultTextStyle
-                        .of(context)
-                        .style),
-              )
-            ],
-          )
-        ],
-      ),
-    )),
+                      child: Text(
+                          "Hossz: ${(consultation.duration / 60).toString()} óra",
+                          style: DefaultTextStyle.of(context).style),
+                    )
+                  ],
+                )
+              ],
+            ),
+          )),
     );
   }
 }

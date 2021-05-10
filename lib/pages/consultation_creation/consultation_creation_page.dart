@@ -32,19 +32,7 @@ class ConsultationCreationPage extends StatelessWidget {
         appBar: AppBar(
           title: Text(this.consultation.id != null
               ? "Konzultáció szerkesztése"
-              : "Konzultáció rögzítése"),
-          actions: <Widget>[
-            IconButton(
-                icon: Icon(Icons.logout),
-                color: Colors.white,
-                onPressed: () {
-                  _loginService.logout();
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
-                      (r) => false);
-                })
-          ],
+              : "Konzultáció rögzítése", style: TextStyle(color: Colors.white),)
         ),
         body: ConsultationCreationForm(this.tasks, this.consultation,
             onSubmitted: (Consultation consultation) async {

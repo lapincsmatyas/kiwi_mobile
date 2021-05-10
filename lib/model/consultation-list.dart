@@ -23,7 +23,6 @@ class ConsultationList extends ChangeNotifier{
     } else {
       this.consultations = [];
     }
-    notifyListeners();
   }
 
   void add(Consultation consultation){
