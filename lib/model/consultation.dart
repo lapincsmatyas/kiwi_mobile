@@ -8,22 +8,26 @@ part 'consultation.g.dart';
 @JsonSerializable()
 class Consultation {
   String? id;
-  int? startDate;
-  int? duration;
-  bool? allDay;
+  int startDate;
+  int duration;
+  bool allDay;
   String? description;
   Task? taskDTO;
   String? taskId;
-  List<Expense>? expensesDTO;
+  List<Expense> expensesDTO;
 
   Consultation(
       {this.id,
-      this.startDate,
-      this.duration,
-      this.allDay,
+      startDate,
+      duration,
+      allDay,
       this.description,
       this.taskDTO,
-      this.expensesDTO});
+      expensesDTO}) :
+        startDate = startDate ?? DateTime.now().millisecondsSinceEpoch,
+        allDay = allDay ?? false,
+        expensesDTO = expensesDTO  ?? [],
+        duration = duration ?? 60;
 
   dynamic toJson() => _$ConsultationToJson(this);
 

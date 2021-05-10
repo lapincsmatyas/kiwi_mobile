@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:kiwi_mobile/pages/consultation_creation/consultation_creation_page.dart';
 
 class ConsultationListComponent extends StatefulWidget {
-  String? jwt;
+  final String? jwt;
 
   ConsultationListComponent(this.jwt);
 
@@ -43,12 +43,9 @@ class _ConsultationListComponentState extends State<ConsultationListComponent> {
                           MultiProvider(
                               providers: [
                                 ChangeNotifierProvider<ConsultationList>.value(
-                                    value: consultationList),
-                                ChangeNotifierProvider<TaskList>.value(
-                                    value: taskList)
+                                    value: consultationList)
                               ],
-                              child: ConsultationCreationPage(widget.jwt,
-                                  consultation: consultation)),
+                              child: ConsultationCreationPage(taskList.tasks, widget.jwt, consultation)),
                     ),);
                 }, onDismissed: (direction, consultation) {
               consultationList.removeById(consultation.id!);
@@ -132,7 +129,7 @@ class ConsultationListItem extends StatelessWidget {
               Container(
                 child: Text(
                     new DateTime.fromMillisecondsSinceEpoch(
-                        consultation.startDate!)
+                        consultation.startDate)
                         .toString(),
                     style: DefaultTextStyle
                         .of(context)
@@ -140,7 +137,7 @@ class ConsultationListItem extends StatelessWidget {
               ),
               Container(
                 child: Text(
-                    "Hossz: ${(consultation.duration! / 60).toString()} óra",
+                    "Hossz: ${(consultation.duration / 60).toString()} óra",
                     style: DefaultTextStyle
                         .of(context)
                         .style),

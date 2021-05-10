@@ -8,24 +8,26 @@ import 'package:kiwi_mobile/model/task-list.dart';
 import 'package:kiwi_mobile/pages/consultation_creation/consultation_creation_page.dart';
 import 'package:kiwi_mobile/pages/task_details_page/consultation_list_component.dart';
 import 'package:kiwi_mobile/services/consultation-service.dart';
-import 'package:kiwi_mobile/services/login-service.dart';
 import 'package:provider/provider.dart';
 
-import '../login_page.dart';
-
-class ConsultationListPage extends StatelessWidget {
-  final _consultationService = ConsultationService();
-  final _loginService = LoginService();
+class ConsultationListPage extends StatefulWidget {
   final String? jwt;
-
-  ConsultationList consultationList = new ConsultationList();
 
   ConsultationListPage(this.jwt);
 
   @override
+  _ConsultationListPageState createState() => _ConsultationListPageState();
+}
+
+class _ConsultationListPageState extends State<ConsultationListPage> {
+  final _consultationService = ConsultationService();
+
+  ConsultationList consultationList = new ConsultationList();
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: _consultationService.getListOfConsultations(jwt),
+        future: _consultationService.getListOfConsultations(widget.jwt),
         builder: (context, AsyncSnapshot<List<Consultation>?> snapshot) {
           return ChangeNotifierProvider<ConsultationList>.value(
             value: consultationList,
@@ -38,7 +40,7 @@ class ConsultationListPage extends StatelessWidget {
               body: Builder(builder: (context) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   consultationList.setConsultations(snapshot.data);
-                  return ConsultationListComponent(jwt);
+                  return ConsultationListComponent(widget.jwt);
                 } else {
                   return CircularProgressIndicator();
                 }
@@ -52,13 +54,14 @@ class ConsultationListPage extends StatelessWidget {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => MultiProvider(providers: [
-                                  ChangeNotifierProvider<
-                                          ConsultationList>.value(
-                                      value: consultationList),
-                                  ChangeNotifierProvider<TaskList>.value(
-                                      value: taskList),
-                                ], child: ConsultationCreationPage(jwt))));
+                            builder: (context) => MultiProvider(
+                                    providers: [
+                                      ChangeNotifierProvider<
+                                              ConsultationList>.value(
+                                          value: consultationList)
+                                    ],
+                                    child: ConsultationCreationPage(
+                                        taskList.tasks, widget.jwt, new Consultation()))));
                   }),
             ),
           );

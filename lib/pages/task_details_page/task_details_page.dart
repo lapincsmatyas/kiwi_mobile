@@ -7,15 +7,12 @@ import 'package:kiwi_mobile/model/consultation.dart';
 import 'package:kiwi_mobile/model/task-list.dart';
 import 'package:kiwi_mobile/model/task.dart';
 import 'package:kiwi_mobile/services/consultation-service.dart';
-import 'package:kiwi_mobile/services/login-service.dart';
 import 'package:provider/provider.dart';
 
 import '../consultation_creation/consultation_creation_page.dart';
-import '../login_page.dart';
 import 'consultation_list_component.dart';
 
 class TaskDetailsPage extends StatelessWidget {
-  final _loginService = LoginService();
   final _consultationService = ConsultationService();
 
   final Task task;
@@ -33,28 +30,15 @@ class TaskDetailsPage extends StatelessWidget {
             return Text(snapshot.error.toString());
           }
           return ChangeNotifierProvider(
-              create: (context) =>
-                  ConsultationList(consultations: snapshot.data),
+              create: (context) => ConsultationList(consultations: snapshot.data),
               child: Builder(
                 builder: (context) {
                   var consultationList = context.watch<ConsultationList>();
                   var taskList = context.read<TaskList>();
                   return Scaffold(
                     appBar: AppBar(
-                      title: Text(task.code!),
-                      actions: <Widget>[
-                        IconButton(
-                            icon: Icon(Icons.logout),
-                            color: Colors.white,
-                            onPressed: () {
-                              _loginService.logout();
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => LoginPage()),
-                                  (r) => false);
-                            })
-                      ],
+                      title: Text(task.code!,
+                          style: TextStyle(color: Colors.white)),
                     ),
                     body: Container(
                       padding: new EdgeInsets.all(10.0),
@@ -104,6 +88,7 @@ class TaskDetailsPage extends StatelessWidget {
                             Builder(builder: (context) {
                               if (snapshot.connectionState ==
                                   ConnectionState.done) {
+                                consultationList.setConsultations(snapshot.data);
                                 return Expanded(
                                     child: Container(
                                         height: 200,
@@ -123,12 +108,12 @@ class TaskDetailsPage extends StatelessWidget {
                                   providers: [
                                     ChangeNotifierProvider<
                                             ConsultationList>.value(
-                                        value: consultationList),
-                                    ChangeNotifierProvider<TaskList>.value(
-                                        value: taskList),
+                                        value: consultationList)
                                   ],
-                                  child: ConsultationCreationPage(jwt,
-                                      task: task)),
+                                  child: ConsultationCreationPage(
+                                      taskList.tasks,
+                                      jwt,
+                                      new Consultation(taskDTO: task))),
                             ));
                       },
                       child: const Icon(Icons.add),

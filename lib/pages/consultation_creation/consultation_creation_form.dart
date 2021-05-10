@@ -1,24 +1,24 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kiwi_mobile/model/consultation.dart';
-import 'package:kiwi_mobile/model/task-list.dart';
 import 'package:kiwi_mobile/model/task.dart';
-import 'package:provider/provider.dart';
 
 class ConsultationCreationForm extends StatefulWidget {
   Consultation consultation;
-  DateTime? selectedDate;
-  TimeOfDay? selectedTime;
+  DateTime selectedDate;
+  TimeOfDay selectedTime;
   Function(Consultation consultation) onSubmitted;
+  List<Task> tasks;
 
-  ConsultationCreationForm(this.consultation, {required this.onSubmitted}) {
-    selectedDate =
-        DateTime.fromMillisecondsSinceEpoch(this.consultation.startDate!);
-    selectedTime =
-        TimeOfDay(hour: selectedDate!.hour, minute: selectedDate!.minute);
-  }
+  ConsultationCreationForm(this.tasks, this.consultation,
+      {required this.onSubmitted})
+      : selectedDate =
+            DateTime.fromMillisecondsSinceEpoch(consultation.startDate),
+        selectedTime = TimeOfDay(
+            hour: DateTime.fromMillisecondsSinceEpoch(consultation.startDate)
+                .hour,
+            minute: DateTime.fromMillisecondsSinceEpoch(consultation.startDate)
+                .minute);
 
   @override
   _ConsultationCreationFormState createState() =>
@@ -26,15 +26,12 @@ class ConsultationCreationForm extends StatefulWidget {
 }
 
 class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
-  DateTime? selectedDate;
-  TimeOfDay? selectedTime;
-
   final _formKey = GlobalKey<FormState>();
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: widget.selectedDate!,
+        initialDate: widget.selectedDate,
         firstDate: DateTime(2019, 1),
         lastDate: DateTime(2025));
     if (picked != null) {
@@ -47,7 +44,7 @@ class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
   Future<Null> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: widget.selectedTime!,
+      initialTime: widget.selectedTime,
       builder: (BuildContext context, Widget? child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
@@ -64,8 +61,6 @@ class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
 
   @override
   Widget build(BuildContext context) {
-    TaskList taskList = context.watch<TaskList>();
-
     return Container(
         padding: const EdgeInsets.all(10.0),
         child: Form(
@@ -85,7 +80,7 @@ class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
                           }
                           return null;
                         },
-                        items: taskList.tasks
+                        items: widget.tasks
                             .map((task) => new DropdownMenuItem<Task>(
                                 value: task,
                                 child: Column(
@@ -108,7 +103,7 @@ class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
                       ElevatedButton(
                           onPressed: () => _selectDate(context),
                           child: Text(
-                              "${widget.selectedDate!.year}.${widget.selectedDate!.month.toString().padLeft(2, '0')}.${widget.selectedDate!.day.toString().padLeft(2, '0')}")),
+                              "${widget.selectedDate.year}.${widget.selectedDate.month.toString().padLeft(2, '0')}.${widget.selectedDate.day.toString().padLeft(2, '0')}")),
                     ],
                   ),
                   SizedBox(
@@ -119,7 +114,7 @@ class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
                       ElevatedButton(
                           onPressed: () => _selectTime(context),
                           child: Text(
-                              "${widget.selectedTime!.hour.toString().padLeft(2, '0')}:${widget.selectedTime!.minute.toString().padLeft(2, '0')}"))
+                              "${widget.selectedTime.hour.toString().padLeft(2, '0')}:${widget.selectedTime.minute.toString().padLeft(2, '0')}"))
                     ],
                   ),
                 ],
@@ -135,13 +130,13 @@ class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
                             Text("${((index + 1) * 15 / 60).toString()} óra"))),
                 onChanged: (value) {
                   setState(() {
-                    widget.consultation.duration = value;
+                    widget.consultation.duration = value ?? 60;
                   });
                 },
               ),
               Text("Egész nap"),
               Switch(
-                  value: (widget.consultation.allDay)!,
+                  value: (widget.consultation.allDay),
                   onChanged: (value) {
                     setState(() {
                       widget.consultation.allDay = value;
@@ -163,17 +158,12 @@ class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
                     if (_formKey.currentState!.validate()) {
                       var selectedDate = widget.selectedDate;
                       var selectedTime = widget.selectedTime;
-                      DateTime date;
-                      if (selectedDate != null && selectedTime != null) {
-                        date = new DateTime(
+                      DateTime date = new DateTime(
                             selectedDate.year,
                             selectedDate.month,
                             selectedDate.day,
                             selectedTime.hour,
                             selectedTime.minute);
-                      } else {
-                        date = DateTime.now();
-                      }
                       Consultation consultation = widget.consultation;
                       consultation.startDate = date.millisecondsSinceEpoch;
                       widget.onSubmitted(widget.consultation);

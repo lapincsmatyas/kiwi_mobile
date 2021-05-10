@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kiwi_mobile/model/jwt.dart';
 import 'package:kiwi_mobile/model/task-list.dart';
 import 'package:kiwi_mobile/model/task.dart';
 import 'package:kiwi_mobile/services/task-service.dart';
@@ -11,9 +10,7 @@ import '../task_details_page/task_details_page.dart';
 class TaskListComponent extends StatelessWidget {
   final String? _jwt;
 
-  TaskListComponent(this._jwt) {}
-
-  final _taskService = TaskService();
+  TaskListComponent(this._jwt);
 
   @override
   Widget build(BuildContext context) {

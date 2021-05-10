@@ -4,7 +4,6 @@ import 'package:kiwi_mobile/services/login-service.dart';
 
 import 'pages/login_page.dart';
 
-
 void main() {
   runApp(MyApp());
 }
@@ -22,8 +21,10 @@ class MyApp extends StatelessWidget {
       home: FutureBuilder(
           future: _loginService.getJwt(),
           builder: (context, snapshot) {
-            if (!snapshot.hasData) return CircularProgressIndicator();
-            if (snapshot.data != "") {
+            if (snapshot.hasError) {
+              return LoginPage();
+            }
+            if (!snapshot.hasData && snapshot.data != "") {
               return TaskListPage(snapshot.data.toString());
             } else {
               return LoginPage();
