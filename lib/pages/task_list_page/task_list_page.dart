@@ -47,7 +47,7 @@ class _TaskListPageState extends State<TaskListPage> {
                           ListView(padding: EdgeInsets.zero, children: <Widget>[
                     DrawerHeader(
                       child: Container(
-                        padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
                           child: Image.asset('assets/kiwi_logo.png')),
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
@@ -87,24 +87,24 @@ class _TaskListPageState extends State<TaskListPage> {
                                             widget._jwt))));
                       },
                     ),
-                            ListTile(
-                              title: Row(
-                                children: [
-                                  Icon(Icons.logout,
-                                      color: Theme.of(context).primaryColor),
-                                  SizedBox(width: 10),
-                                  Text('Kijelentkezés')
-                                ],
-                              ),
-                              onTap: () {
-                                _loginService.logout();
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => LoginPage()),
-                                        (r) => false);
-                              },
-                            ),
+                    ListTile(
+                      title: Row(
+                        children: [
+                          Icon(Icons.logout,
+                              color: Theme.of(context).primaryColor),
+                          SizedBox(width: 10),
+                          Text('Kijelentkezés')
+                        ],
+                      ),
+                      onTap: () {
+                        _loginService.logout();
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage()),
+                            (r) => false);
+                      },
+                    ),
                   ])),
                   body: Builder(builder: (context) {
                     if (snapshot.connectionState == ConnectionState.done) {

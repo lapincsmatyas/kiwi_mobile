@@ -10,6 +10,10 @@ import 'package:kiwi_mobile/pages/task_details_page/consultation_list_component.
 import 'package:kiwi_mobile/services/consultation-service.dart';
 import 'package:provider/provider.dart';
 
+import 'calendar_view_page.dart';
+
+enum ViewMode { CALENDAR, LIST, TABLE }
+
 class ConsultationListPage extends StatefulWidget {
   final String? jwt;
 
@@ -21,6 +25,7 @@ class ConsultationListPage extends StatefulWidget {
 
 class _ConsultationListPageState extends State<ConsultationListPage> {
   final _consultationService = ConsultationService();
+  ViewMode viewMode = ViewMode.LIST;
 
   ConsultationList consultationList = new ConsultationList();
 
@@ -36,11 +41,33 @@ class _ConsultationListPageState extends State<ConsultationListPage> {
                 foregroundColor: Colors.white,
                 title: Text("Rögzített óráim",
                     style: TextStyle(color: Colors.white)),
+                actions: <Widget>[
+                  IconButton(
+                      icon: Icon(
+                          viewMode == ViewMode.CALENDAR
+                              ? Icons.list
+                              : Icons.calendar_today,
+                          color: Colors.white),
+                      onPressed: () {
+                        setState(() {
+                          viewMode = viewMode == ViewMode.CALENDAR
+                              ? ViewMode.LIST
+                              : ViewMode.CALENDAR;
+                        });
+                      })
+                ],
               ),
               body: Builder(builder: (context) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   consultationList.setConsultations(snapshot.data);
-                  return ConsultationListComponent(widget.jwt);
+                  switch (viewMode) {
+                    case ViewMode.CALENDAR:
+                      return CalendarViewComponent(widget.jwt);
+                    case ViewMode.LIST:
+                      return ConsultationListComponent(widget.jwt);
+                    case ViewMode.TABLE:
+                      return Text("WIP");
+                  }
                 } else {
                   return CircularProgressIndicator();
                 }
@@ -61,7 +88,9 @@ class _ConsultationListPageState extends State<ConsultationListPage> {
                                           value: consultationList)
                                     ],
                                     child: ConsultationCreationPage(
-                                        taskList.tasks, widget.jwt, new Consultation()))));
+                                        taskList.tasks,
+                                        widget.jwt,
+                                        new Consultation()))));
                   }),
             ),
           );
