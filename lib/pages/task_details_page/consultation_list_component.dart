@@ -108,7 +108,7 @@ class ConsultationListItem extends StatelessWidget {
                     child: Container(
                       child: Text(
                         consultation.description ??
-                            "wetwert wet wet wet wet wet wert wet wert ",
+                            " - ",
                         style: TextStyle(fontSize: 20),
                         overflow: TextOverflow.ellipsis,
                       ),

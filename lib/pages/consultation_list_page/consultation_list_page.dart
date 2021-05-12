@@ -24,18 +24,24 @@ class ConsultationListPage extends StatefulWidget {
 }
 
 class _ConsultationListPageState extends State<ConsultationListPage> {
-  final _consultationService = ConsultationService();
   ViewMode viewMode = ViewMode.LIST;
 
-  ConsultationList consultationList = new ConsultationList();
+  final _consultationService = ConsultationService();
+  late Future<List<Consultation>?> _consultationList;
+
+  @override
+  void initState() {
+    super.initState();
+    _consultationList = _consultationService.getListOfConsultations(widget.jwt);
+  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: _consultationService.getListOfConsultations(widget.jwt),
+        future: _consultationList,
         builder: (context, AsyncSnapshot<List<Consultation>?> snapshot) {
-          return ChangeNotifierProvider<ConsultationList>.value(
-            value: consultationList,
+          return ChangeNotifierProvider<ConsultationList>(
+            create: (context) => ConsultationList(),
             child: Scaffold(
               appBar: AppBar(
                 foregroundColor: Colors.white,
@@ -59,7 +65,7 @@ class _ConsultationListPageState extends State<ConsultationListPage> {
               ),
               body: Builder(builder: (context) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  consultationList.setConsultations(snapshot.data);
+                  context.read<ConsultationList>().setConsultations(snapshot.data);
                   switch (viewMode) {
                     case ViewMode.CALENDAR:
                       return CalendarViewComponent(widget.jwt);
@@ -85,7 +91,7 @@ class _ConsultationListPageState extends State<ConsultationListPage> {
                                     providers: [
                                       ChangeNotifierProvider<
                                               ConsultationList>.value(
-                                          value: consultationList)
+                                          value: context.read<ConsultationList>())
                                     ],
                                     child: ConsultationCreationPage(
                                         taskList.tasks,

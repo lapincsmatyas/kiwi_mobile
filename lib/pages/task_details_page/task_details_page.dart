@@ -12,21 +12,33 @@ import 'package:provider/provider.dart';
 import '../consultation_creation/consultation_creation_page.dart';
 import 'consultation_list_component.dart';
 
-class TaskDetailsPage extends StatelessWidget {
-  final _consultationService = ConsultationService();
-
+class TaskDetailsPage extends StatefulWidget {
   final Task task;
   final String? jwt;
 
   TaskDetailsPage(this.jwt, this.task);
 
   @override
+  _TaskDetailsPageState createState() => _TaskDetailsPageState();
+}
+
+class _TaskDetailsPageState extends State<TaskDetailsPage> {
+  final _consultationService = ConsultationService();
+  late Future<List<Consultation>?> _consultationList;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _consultationList = _consultationService.getListOfConsultations(widget.jwt, task: widget.task);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: _consultationService.getListOfConsultations(jwt, task: task),
+        future: _consultationList,
         builder: (context, AsyncSnapshot<List<Consultation>?> snapshot) {
           if (snapshot.hasError) {
-            log(snapshot.error.toString());
             return Text(snapshot.error.toString());
           }
           return ChangeNotifierProvider(
@@ -37,7 +49,7 @@ class TaskDetailsPage extends StatelessWidget {
                   var taskList = context.read<TaskList>();
                   return Scaffold(
                     appBar: AppBar(
-                      title: Text(task.code!,
+                      title: Text(widget.task.code!,
                           style: TextStyle(color: Colors.white)),
                     ),
                     body: Container(
@@ -52,7 +64,7 @@ class TaskDetailsPage extends StatelessWidget {
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              task.code!,
+                              widget.task.code!,
                             ),
                             SizedBox(height: 10),
                             Text(
@@ -61,7 +73,7 @@ class TaskDetailsPage extends StatelessWidget {
                                   color: Theme.of(context).primaryColor,
                                   fontWeight: FontWeight.bold),
                             ),
-                            Text(task.description!),
+                            Text(widget.task.description!),
                             SizedBox(height: 10),
                             Text(
                               "Taszk státusza",
@@ -69,7 +81,7 @@ class TaskDetailsPage extends StatelessWidget {
                                   color: Theme.of(context).primaryColor,
                                   fontWeight: FontWeight.bold),
                             ),
-                            Text(task.taskStatus!),
+                            Text(widget.task.taskStatus!),
                             SizedBox(height: 10),
                             Text(
                               "Taszk típusa",
@@ -77,7 +89,7 @@ class TaskDetailsPage extends StatelessWidget {
                                   color: Theme.of(context).primaryColor,
                                   fontWeight: FontWeight.bold),
                             ),
-                            Text(task.taskType!),
+                            Text(widget.task.taskType!),
                             SizedBox(height: 20),
                             Text(
                               "Konzultációk",
@@ -92,7 +104,7 @@ class TaskDetailsPage extends StatelessWidget {
                                 return Expanded(
                                     child: Container(
                                         height: 200,
-                                        child: ConsultationListComponent(jwt)));
+                                        child: ConsultationListComponent(widget.jwt)));
                               } else {
                                 return CircularProgressIndicator();
                               }
@@ -112,8 +124,8 @@ class TaskDetailsPage extends StatelessWidget {
                                   ],
                                   child: ConsultationCreationPage(
                                       taskList.tasks,
-                                      jwt,
-                                      new Consultation(taskDTO: task))),
+                                      widget.jwt,
+                                      new Consultation(taskDTO: widget.task))),
                             ));
                       },
                       child: const Icon(Icons.add),

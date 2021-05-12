@@ -24,19 +24,26 @@ class _TaskListPageState extends State<TaskListPage> {
   final _taskService = TaskService();
   final _loginService = LoginService();
 
+  late Future<List<Task>?> _taskList;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _taskList = getListOfTasks();
+  }
+
   Future<List<Task>?> getListOfTasks() async {
     return _taskService.getListOfTasks(widget._jwt);
   }
 
-  TaskList taskList = new TaskList();
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: getListOfTasks(),
+        future: _taskList,
         builder: (context, AsyncSnapshot<List<Task>?> snapshot) {
-          return ChangeNotifierProvider<TaskList>.value(
-              value: taskList,
+          return ChangeNotifierProvider<TaskList>(
+              create: (context) => TaskList(),
               child: Scaffold(
                   appBar: AppBar(
                     title: Text("Elérhető projektek",
@@ -82,7 +89,7 @@ class _TaskListPageState extends State<TaskListPage> {
                             MaterialPageRoute(
                                 builder: (context) =>
                                     ChangeNotifierProvider<TaskList>.value(
-                                        value: taskList,
+                                        value: context.read<TaskList>(),
                                         child: ConsultationListPage(
                                             widget._jwt))));
                       },
@@ -108,7 +115,7 @@ class _TaskListPageState extends State<TaskListPage> {
                   ])),
                   body: Builder(builder: (context) {
                     if (snapshot.connectionState == ConnectionState.done) {
-                      taskList.setTasks(snapshot.data);
+                      context.read<TaskList>().setTasks(snapshot.data);
                       return TaskListComponent(widget._jwt);
                     } else {
                       return Center(child: CircularProgressIndicator());
