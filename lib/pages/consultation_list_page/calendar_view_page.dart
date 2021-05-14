@@ -5,9 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:provider/provider.dart';
 
 class CalendarViewComponent extends StatefulWidget {
-  final String? jwt;
-
-  const CalendarViewComponent(this.jwt);
+  const CalendarViewComponent();
 
   @override
   _CalendarViewComponentState createState() => _CalendarViewComponentState();

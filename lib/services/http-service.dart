@@ -1,6 +1,9 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:kiwi_mobile/model/dto/task-dto.dart';
+import 'package:kiwi_mobile/model/jwt.dart';
 import 'package:kiwi_mobile/services/login-service.dart';
 
 class HttpService {
@@ -23,30 +26,56 @@ class HttpService {
         log(error.message);
         return handler.next(error);
       },
-      onRequest: (options, handler) {
-        log("${options.method} ${options.path}");
+      onRequest: (options, handler) async {
+        String accessToken = await loginService.getAccessToken() ?? "";
+        options.headers[HttpHeaders.authorizationHeader] = "Bearer " + accessToken;
         return handler.next(options);
       },
       onResponse: (response, handler) {
-        log(response.data);
         return handler.next(response);
-      }
-    ));
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async{
-        String jwt = await loginService.getJwt() ?? "";
-        options.headers["Authorization"] = "Bearer " + jwt;
       }
     ));
   }
 
-  Future<Response> getRequest(String endPoint) async {
+  Future<Response> get(String endPoint) async {
     Response response;
     try {
       response = await _dio.get(endPoint);
     } on DioError catch (e){
-      log(e.message);
-      throw Exception(e.message);
+      throw Exception(e.message.toString());
+    }
+
+    return response;
+  }
+
+  Future<Response> put(String endPoint, {data}) async {
+    Response response;
+    try {
+      response = await _dio.put(endPoint, data: data);
+    } on DioError catch (e){
+      throw Exception(e.message.toString());
+    }
+
+    return response;
+  }
+
+  Future<Response> post(String endPoint, {data}) async {
+    Response response;
+    try {
+      response = await _dio.post(endPoint, data: data);
+    } on DioError catch (e){
+      throw Exception(e.message.toString());
+    }
+
+    return response;
+  }
+
+  Future<Response> delete(String endPoint) async {
+    Response response;
+    try {
+      response = await _dio.delete(endPoint);
+    } on DioError catch (e){
+      throw Exception(e.message.toString());
     }
 
     return response;

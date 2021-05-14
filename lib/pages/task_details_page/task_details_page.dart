@@ -14,9 +14,8 @@ import 'consultation_list_component.dart';
 
 class TaskDetailsPage extends StatefulWidget {
   final Task task;
-  final String? jwt;
 
-  TaskDetailsPage(this.jwt, this.task);
+  TaskDetailsPage(this.task);
 
   @override
   _TaskDetailsPageState createState() => _TaskDetailsPageState();
@@ -30,7 +29,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   void initState() {
     super.initState();
 
-    _consultationList = _consultationService.getListOfConsultations(widget.jwt, task: widget.task);
+    _consultationList = _consultationService.getListOfConsultations(task: widget.task);
   }
 
   @override
@@ -49,7 +48,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                   var taskList = context.read<TaskList>();
                   return Scaffold(
                     appBar: AppBar(
-                      title: Text(widget.task.code!,
+                      title: Text(widget.task.code,
                           style: TextStyle(color: Colors.white)),
                     ),
                     body: Container(
@@ -64,7 +63,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              widget.task.code!,
+                              widget.task.code,
                             ),
                             SizedBox(height: 10),
                             Text(
@@ -104,7 +103,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                 return Expanded(
                                     child: Container(
                                         height: 200,
-                                        child: ConsultationListComponent(widget.jwt)));
+                                        child: ConsultationListComponent()));
                               } else {
                                 return CircularProgressIndicator();
                               }
@@ -124,7 +123,6 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                   ],
                                   child: ConsultationCreationPage(
                                       taskList.tasks,
-                                      widget.jwt,
                                       new Consultation(taskDTO: widget.task))),
                             ));
                       },

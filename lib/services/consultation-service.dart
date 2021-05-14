@@ -10,29 +10,24 @@ import 'package:kiwi_mobile/model/dto/consultation-dto.dart';
 import 'package:kiwi_mobile/model/dto/filter-dto.dart';
 import 'package:kiwi_mobile/model/task.dart';
 
+import 'http-service.dart';
+
 final storage = FlutterSecureStorage();
 
 class ConsultationService {
-  var REST_API_IP = 'http://10.0.2.2:10080/rest';
+  HttpService httpService = HttpService();
 
-  var _dio = Dio.Dio();
-
-  Future<List<Consultation>?> getListOfConsultations(String? jwt,
-      {Task? task = null}) async {
-    _dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer $jwt";
+  Future<List<Consultation>?> getListOfConsultations({Task? task}) async {
     var orderParams = new Map<String, String>();
     orderParams["startDate"] = "ASC";
     FilterDto filter = new FilterDto(task?.id, 1, 10, null, null, orderParams);
-    var response = await _dio.post('$REST_API_IP/consultation/filter',
-        data: filter.toJson());
+    var response = await this.httpService.post('/consultation/filter', data: filter.toJson());
     List<Consultation>? consultations =
         ConsultationDto.fromJson(response.data).data;
     return consultations;
   }
 
-  Future<Consultation?> createConsultation(
-      String? jwt, Consultation consultation) async {
-    _dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer $jwt";
+  Future<Consultation?> createConsultation(Consultation consultation) async {
     ConsultationCreationDto consultationCreationDto =
         new ConsultationCreationDto(
             consultation.id,
@@ -43,9 +38,7 @@ class ConsultationService {
             consultation.taskDTO!.id,
             consultation.expensesDTO);
 
-    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
-    var response = await _dio.put('$REST_API_IP/consultation',
-        data: consultationCreationDto.toJson());
+    var response = await this.httpService.put('/consultation', data: consultationCreationDto.toJson());
     ConsultationCreationResponseDto consultationCreationResponseDto = ConsultationCreationResponseDto.fromJson(response.data);
     if (consultationCreationResponseDto.successful != null && consultationCreationResponseDto.successful == true){
       consultation.id = consultationCreationResponseDto.data;
@@ -55,8 +48,7 @@ class ConsultationService {
     }
   }
 
-  Future<Consultation?> updateConsultation(String? jwt, Consultation consultation) async {
-    _dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer $jwt";
+  Future<Consultation?> updateConsultation(Consultation consultation) async {
 
     ConsultationCreationDto consultationCreationDto =
     new ConsultationCreationDto(
@@ -68,8 +60,7 @@ class ConsultationService {
         consultation.taskDTO!.id,
         consultation.expensesDTO);
 
-    var response = await _dio.post('$REST_API_IP/consultation/update',
-        data: consultationCreationDto.toJson());
+    var response = await this.httpService.post('/consultation/update', data: consultationCreationDto.toJson());
 
     ConsultationCreationResponseDto consultationCreationResponseDto = ConsultationCreationResponseDto.fromJson(response.data);
     if (consultationCreationResponseDto.successful != null && consultationCreationResponseDto.successful == true){
@@ -79,10 +70,8 @@ class ConsultationService {
     }
   }
 
-  Future<String?> deleteConsultation(String? jwt, Consultation consultation) async {
-    _dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer $jwt";
-
-    var response = await _dio.delete('$REST_API_IP/consultation/${consultation.id}');
+  Future<String?> deleteConsultation(Consultation consultation) async {
+    var response = await this.httpService.delete('/consultation/${consultation.id}');
     ConsultationCreationResponseDto consultationCreationResponseDto = ConsultationCreationResponseDto.fromJson(response.data);
     if (consultationCreationResponseDto.successful != null && consultationCreationResponseDto.successful == true){
       return consultation.id;

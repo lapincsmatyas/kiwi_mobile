@@ -10,9 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:kiwi_mobile/pages/consultation_creation/consultation_creation_page.dart';
 
 class ConsultationListComponent extends StatefulWidget {
-  final String? jwt;
-
-  ConsultationListComponent(this.jwt);
+  ConsultationListComponent();
 
   @override
   _ConsultationListComponentState createState() =>
@@ -32,8 +30,7 @@ class _ConsultationListComponentState extends State<ConsultationListComponent> {
     return ListView.builder(
         itemCount: consultationList.consultations.length,
         itemBuilder: (context, index) {
-          return ConsultationListItem(
-              widget.jwt, consultationList.consultations[index],
+          return ConsultationListItem(consultationList.consultations[index],
               onPressed: (consultation) {
             Navigator.push(
               context,
@@ -44,7 +41,7 @@ class _ConsultationListComponentState extends State<ConsultationListComponent> {
                           value: consultationList)
                     ],
                     child: ConsultationCreationPage(
-                        taskList.tasks, widget.jwt, consultation)),
+                        taskList.tasks, consultation)),
               ),
             );
           }, onDismissed: (direction, consultation) {
@@ -64,7 +61,7 @@ class ConsultationListItem extends StatelessWidget {
   Function(Consultation consultation) onPressed;
   Function(DismissDirection direction, Consultation consultation) onDismissed;
 
-  ConsultationListItem(this.jwt, this.consultation,
+  ConsultationListItem(this.consultation,
       {required this.onPressed, required this.onDismissed});
 
   @override
@@ -76,7 +73,7 @@ class ConsultationListItem extends StatelessWidget {
           confirmDismiss: (direction) async {
             var result = await this
                 ._consultationService
-                .deleteConsultation(jwt, consultation);
+                .deleteConsultation(consultation);
             if (result == null) {
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text("Sikertelen törlés")));

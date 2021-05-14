@@ -15,9 +15,7 @@ import 'calendar_view_page.dart';
 enum ViewMode { CALENDAR, LIST, TABLE }
 
 class ConsultationListPage extends StatefulWidget {
-  final String? jwt;
-
-  ConsultationListPage(this.jwt);
+  ConsultationListPage();
 
   @override
   _ConsultationListPageState createState() => _ConsultationListPageState();
@@ -32,7 +30,7 @@ class _ConsultationListPageState extends State<ConsultationListPage> {
   @override
   void initState() {
     super.initState();
-    _consultationList = _consultationService.getListOfConsultations(widget.jwt);
+    _consultationList = _consultationService.getListOfConsultations();
   }
 
   @override
@@ -68,9 +66,9 @@ class _ConsultationListPageState extends State<ConsultationListPage> {
                   context.read<ConsultationList>().setConsultations(snapshot.data);
                   switch (viewMode) {
                     case ViewMode.CALENDAR:
-                      return CalendarViewComponent(widget.jwt);
+                      return CalendarViewComponent();
                     case ViewMode.LIST:
-                      return ConsultationListComponent(widget.jwt);
+                      return ConsultationListComponent();
                     case ViewMode.TABLE:
                       return Text("WIP");
                   }
@@ -95,7 +93,6 @@ class _ConsultationListPageState extends State<ConsultationListPage> {
                                     ],
                                     child: ConsultationCreationPage(
                                         taskList.tasks,
-                                        widget.jwt,
                                         new Consultation()))));
                   }),
             ),

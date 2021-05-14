@@ -12,9 +12,7 @@ import 'package:kiwi_mobile/model/task.dart';
 import '../login_page.dart';
 
 class TaskListPage extends StatefulWidget {
-  final String? _jwt;
-
-  TaskListPage(this._jwt);
+  TaskListPage();
 
   @override
   _TaskListPageState createState() => _TaskListPageState();
@@ -34,7 +32,7 @@ class _TaskListPageState extends State<TaskListPage> {
   }
 
   Future<List<Task>?> getListOfTasks() async {
-    return _taskService.getListOfTasks(widget._jwt);
+    return _taskService.getListOfTasks();
   }
 
   @override
@@ -90,8 +88,7 @@ class _TaskListPageState extends State<TaskListPage> {
                                 builder: (context) =>
                                     ChangeNotifierProvider<TaskList>.value(
                                         value: context.read<TaskList>(),
-                                        child: ConsultationListPage(
-                                            widget._jwt))));
+                                        child: ConsultationListPage())));
                       },
                     ),
                     ListTile(
@@ -116,7 +113,7 @@ class _TaskListPageState extends State<TaskListPage> {
                   body: Builder(builder: (context) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       context.read<TaskList>().setTasks(snapshot.data);
-                      return TaskListComponent(widget._jwt);
+                      return TaskListComponent();
                     } else {
                       return Center(child: CircularProgressIndicator());
                     }

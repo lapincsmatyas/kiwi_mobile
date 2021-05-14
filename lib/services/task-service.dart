@@ -8,8 +8,8 @@ import 'http-service.dart';
 class TaskService {
   final httpService = HttpService();
 
-  Future<List<Task>> getListOfTasks(String? jwt) async {
-    var response = await httpService.getRequest('/task');
+  Future<List<Task>> getListOfTasks() async {
+    var response = await httpService.get('/task');
     TaskDto? taskDto = TaskDto.fromJson(response.data);
     return taskDto.data;
   }

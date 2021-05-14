@@ -2,25 +2,59 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kiwi_mobile/model/task-list.dart';
 import 'package:kiwi_mobile/model/task.dart';
-import 'package:kiwi_mobile/services/task-service.dart';
 import 'package:provider/provider.dart';
 
 import '../task_details_page/task_details_page.dart';
 
-class TaskListComponent extends StatelessWidget {
-  final String? _jwt;
+class TaskListComponent extends StatefulWidget {
+  TaskListComponent();
 
-  TaskListComponent(this._jwt);
+  @override
+  _TaskListComponentState createState() => _TaskListComponentState();
+}
+
+class _TaskListComponentState extends State<TaskListComponent> {
+  String filter = "";
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
+        SliverAppBar(
+          collapsedHeight: kToolbarHeight + 12,
+          automaticallyImplyLeading: false,
+          floating: true,
+          flexibleSpace: Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(left: 15),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              color: Colors.white.withOpacity(0.3),
+            ),
+            margin: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextField(
+                  style: TextStyle(fontSize: 18.0),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      this.filter = value;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
         SliverList(
-          delegate: SliverChildBuilderDelegate(
-              (context, index) => TaskListItem(_jwt, index),
-              childCount: context
-                  .select<TaskList, int>((taskList) => taskList.tasks.length)),
+          delegate: SliverChildListDelegate(
+            context.read<TaskList>().tasks.where((element) => element.code.toLowerCase().contains(filter.toLowerCase())).map((e) => TaskListItem(e)).toList()
+          )
         ),
       ],
     );
@@ -28,16 +62,12 @@ class TaskListComponent extends StatelessWidget {
 }
 
 class TaskListItem extends StatelessWidget {
-  final int index;
-  final String? _jwt;
+  final Task task;
 
-  const TaskListItem(this._jwt, this.index);
+  const TaskListItem(this.task);
 
   @override
   Widget build(BuildContext context) {
-    var task =
-        context.select<TaskList, Task>((taskList) => taskList.tasks[index]);
-    var taskList = context.read<TaskList>();
 
     return Card(
       child: ListTile(
@@ -48,10 +78,10 @@ class TaskListItem extends StatelessWidget {
                   MaterialPageRoute(
                       builder: (context) =>
                           ChangeNotifierProvider<TaskList>.value(
-                              value: taskList,
-                              child: TaskDetailsPage(this._jwt, task))));
+                              value: context.read<TaskList>(),
+                              child: TaskDetailsPage(task))));
             },
-            child: Container(alignment: Alignment.centerLeft, child: Text(task.code!))),
+            child: Container(alignment: Alignment.centerLeft, child: Text(task.code))),
       ),
     );
   }

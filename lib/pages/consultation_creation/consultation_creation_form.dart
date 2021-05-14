@@ -81,7 +81,7 @@ class _ConsultationCreationFormState extends State<ConsultationCreationForm> {
                               child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [Text(task.code!)])))
+                                  children: [Text(task.code)])))
                           .toList(),
                       onChanged: (value) => {
                             setState(() {

@@ -9,19 +9,15 @@ import 'package:kiwi_mobile/services/consultation-service.dart';
 import 'package:kiwi_mobile/services/login-service.dart';
 import 'package:provider/provider.dart';
 
-import '../login_page.dart';
-
 class ConsultationCreationPage extends StatelessWidget {
-  final _loginService = LoginService();
   final _consultationService = ConsultationService();
 
   final Consultation consultation;
-  final String? jwt;
   final bool create;
 
   final List<Task> tasks;
 
-  ConsultationCreationPage(this.tasks, this.jwt, this.consultation)
+  ConsultationCreationPage(this.tasks, this.consultation)
       : create = consultation.id == null ? true : false;
 
   @override
@@ -40,10 +36,10 @@ class ConsultationCreationPage extends StatelessWidget {
             Consultation? result = this.create
                 ? await this
                     ._consultationService
-                    .createConsultation(jwt, consultation)
+                    .createConsultation(consultation)
                 : await this
                     ._consultationService
-                    .updateConsultation(jwt, consultation);
+                    .updateConsultation(consultation);
             if (result == null) {
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text("Hiba történt!")));

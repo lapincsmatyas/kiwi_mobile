@@ -8,8 +8,8 @@ part of 'task.dart';
 
 Task _$TaskFromJson(Map<String, dynamic> json) {
   return Task(
-    json['id'] as String?,
-    json['code'] as String?,
+    json['id'] as String,
+    json['code'] as String,
     json['description'] as String?,
     json['taskStatus'] as String?,
     json['taskType'] as String?,

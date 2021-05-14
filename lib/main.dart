@@ -18,17 +18,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.lightGreen,
       ),
-      home: FutureBuilder(
-          future: _loginService.getJwt(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return LoginPage();
-            }
-            if (!snapshot.hasData && snapshot.data != "") {
-              return TaskListPage(snapshot.data.toString());
-            } else {
-              return LoginPage();
-            }
+      home: Builder(
+          builder: (context) {
+            return _loginService.isLoggedIn() ?  TaskListPage() : LoginPage();
           }),
     );
   }

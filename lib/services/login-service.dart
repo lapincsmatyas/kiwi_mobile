@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart' as Dio;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../model/jwt.dart';
@@ -5,18 +7,22 @@ import '../model/jwt.dart';
 final storage = FlutterSecureStorage();
 
 class LoginService {
+  bool loggedIn = false;
+
   var _dio = Dio.Dio();
 
   var _AUTH_IP =
       'http://10.0.2.2:8080/auth/realms/kiwi/protocol/openid-connect/token';
 
-  Future<String?> getJwt() async {
-    var jwt = await storage.read(key: "jwt");
-    if (jwt == null) return "";
-    return jwt;
+  Future<String?> getAccessToken() async {
+    return await storage.read(key: "access_token");
   }
 
-  Future<String?> attemptLogin(String username, String password) async {
+  Future<String?> getRefreshToken() async{
+    return await storage.read(key: "refresh_token");
+  }
+
+  Future<JWT?> attemptLogin(String username, String password) async {
     Map<String, String> body = {
       "client_id": "kiwi-rest-client",
       "grant_type": "password",
@@ -31,14 +37,24 @@ class LoginService {
             Dio.Options(contentType: Dio.Headers.formUrlEncodedContentType));
 
     if (response.statusCode == 200) {
-      JWT deserialized = JWT.fromJson(response.data);
-      return deserialized.access_token;
+      JWT jwt = JWT.fromJson(response.data);
+      storage.write(key: "access_token", value: jwt.access_token);
+      storage.write(key: "refresh_token", value: jwt.refresh_token);
+      this.loggedIn = true;
+      return JWT.fromJson(response.data);
+    } else {
+      this.loggedIn = false;
+      return null;
     }
-
-    return null;
   }
 
   void logout() {
-    storage.delete(key: "jwt");
+    storage.delete(key: "access_token");
+    storage.delete(key: "refresh_token");
+    this.loggedIn = false;
+  }
+
+  isLoggedIn() {
+    return this.loggedIn;
   }
 }
