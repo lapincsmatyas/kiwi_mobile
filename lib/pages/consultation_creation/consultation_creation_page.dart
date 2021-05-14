@@ -6,7 +6,6 @@ import 'package:kiwi_mobile/model/consultation.dart';
 import 'package:kiwi_mobile/model/task.dart';
 import 'package:kiwi_mobile/pages/consultation_creation/consultation_creation_form.dart';
 import 'package:kiwi_mobile/services/consultation-service.dart';
-import 'package:kiwi_mobile/services/login-service.dart';
 import 'package:provider/provider.dart';
 
 class ConsultationCreationPage extends StatelessWidget {

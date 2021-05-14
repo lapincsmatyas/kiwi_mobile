@@ -71,25 +71,30 @@ class _TaskListPageState extends State<TaskListPage> {
                         Navigator.pop(context);
                       },
                     ),
-                    ListTile(
-                      title: Row(
-                        children: [
-                          Icon(Icons.list_alt,
-                              color: Theme.of(context).primaryColor),
-                          SizedBox(width: 10),
-                          Text('Rögzített óráim')
-                        ],
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ChangeNotifierProvider<TaskList>.value(
-                                        value: context.read<TaskList>(),
-                                        child: ConsultationListPage())));
-                      },
+                    Builder(
+                      builder: (context) {
+                        return ListTile(
+                          title: Row(
+                            children: [
+                              Icon(Icons.list_alt,
+                                  color: Theme.of(context).primaryColor),
+                              SizedBox(width: 10),
+                              Text('Rögzített óráim')
+                            ],
+                          ),
+                          onTap: () {
+                            var taskList = context.read<TaskList>();
+                            Navigator.pop(context);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        ChangeNotifierProvider<TaskList>.value(
+                                            value: taskList,
+                                            child: ConsultationListPage())));
+                          },
+                        );
+                      }
                     ),
                     ListTile(
                       title: Row(

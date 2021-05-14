@@ -2,8 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:kiwi_mobile/model/dto/task-dto.dart';
-import 'package:kiwi_mobile/model/jwt.dart';
 import 'package:kiwi_mobile/services/login-service.dart';
 
 class HttpService {

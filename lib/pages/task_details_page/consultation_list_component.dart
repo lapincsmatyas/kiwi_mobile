@@ -10,7 +10,8 @@ import 'package:provider/provider.dart';
 import 'package:kiwi_mobile/pages/consultation_creation/consultation_creation_page.dart';
 
 class ConsultationListComponent extends StatefulWidget {
-  ConsultationListComponent();
+  final bool taskSpecific;
+  ConsultationListComponent({this.taskSpecific = false});
 
   @override
   _ConsultationListComponentState createState() =>
@@ -18,44 +19,87 @@ class ConsultationListComponent extends StatefulWidget {
 }
 
 class _ConsultationListComponentState extends State<ConsultationListComponent> {
+  String filter = "";
+  late ConsultationList consultationList;
+  late TaskList taskList;
+
   @override
   Widget build(BuildContext context) {
-    var consultationList = context.watch<ConsultationList>();
-    var taskList = context.read<TaskList>();
+    setState(() {
+      consultationList = context.watch<ConsultationList>();
+      taskList = context.read<TaskList>();
+    });
 
     if (consultationList.consultations.isEmpty) {
       return Text("Nincs rögzített konzultáció ehhez a taszkhoz");
     }
 
-    return ListView.builder(
-        itemCount: consultationList.consultations.length,
-        itemBuilder: (context, index) {
-          return ConsultationListItem(consultationList.consultations[index],
-              onPressed: (consultation) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MultiProvider(
-                    providers: [
-                      ChangeNotifierProvider<ConsultationList>.value(
-                          value: consultationList)
-                    ],
-                    child: ConsultationCreationPage(
-                        taskList.tasks, consultation)),
-              ),
-            );
-          }, onDismissed: (direction, consultation) {
-            consultationList.removeById(consultation.id!);
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text("Konzultáció törölve")));
-          });
-        });
+    return CustomScrollView(
+      slivers: [
+       if(!widget.taskSpecific) SliverAppBar(
+          collapsedHeight: kToolbarHeight + 12,
+          automaticallyImplyLeading: false,
+          floating: true,
+          flexibleSpace: Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(left: 15),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              color: Colors.white.withOpacity(0.3),
+            ),
+            margin: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextField(
+                  style: TextStyle(fontSize: 18.0),
+                  decoration: InputDecoration(
+                    hintText: "Taszk neve",
+                    hintStyle: TextStyle(color: Colors.black12.withOpacity(0.2)),
+                    border: InputBorder.none,
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      this.filter = value;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        SliverList(
+            delegate: SliverChildListDelegate(consultationList
+                .consultations
+                .where((element) =>
+                    element.taskDTO?.code.toLowerCase().contains(filter.toLowerCase()) ?? false)
+                .map((e) => ConsultationListItem(e, onPressed: (consultation) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MultiProvider(
+                              providers: [
+                                ChangeNotifierProvider<ConsultationList>.value(
+                                    value: consultationList)
+                              ],
+                              child: ConsultationCreationPage(
+                                  taskList.tasks, consultation)),
+                        ),
+                      );
+                    }, onDismissed: (direction, consultation) {
+                      consultationList.removeById(consultation.id!);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Konzultáció törölve")));
+                    }))
+                .toList())),
+      ],
+    );
   }
 }
 
 class ConsultationListItem extends StatelessWidget {
-  Consultation consultation;
-  String? jwt;
+  final Consultation consultation;
   final _consultationService = ConsultationService();
 
   Function(Consultation consultation) onPressed;
@@ -104,8 +148,7 @@ class ConsultationListItem extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 8.0),
                     child: Container(
                       child: Text(
-                        consultation.description ??
-                            " - ",
+                        consultation.description ?? " - ",
                         style: TextStyle(fontSize: 20),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -119,9 +162,12 @@ class ConsultationListItem extends StatelessWidget {
                       child: Builder(builder: (context) {
                         var date = DateTime.fromMillisecondsSinceEpoch(
                             consultation.startDate);
-                        var day = "${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}.";
-                        var time = "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
-                        return Text("${day}${consultation.allDay ? "" : " " + time}",
+                        var day =
+                            "${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}.";
+                        var time =
+                            "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
+                        return Text(
+                            "${day}${consultation.allDay ? "" : " " + time}",
                             style: DefaultTextStyle.of(context).style);
                       }),
                     ),

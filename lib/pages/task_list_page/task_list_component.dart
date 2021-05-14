@@ -39,6 +39,8 @@ class _TaskListComponentState extends State<TaskListComponent> {
                   style: TextStyle(fontSize: 18.0),
                   decoration: InputDecoration(
                     border: InputBorder.none,
+                    hintText: "Taszk neve",
+                    hintStyle: TextStyle(color: Colors.black12.withOpacity(0.2)),
                     suffixIcon: Icon(Icons.search),
                   ),
                   onChanged: (value) {
@@ -68,17 +70,17 @@ class TaskListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Card(
       child: ListTile(
         title: TextButton(
             onPressed: () {
+              var temp = context.read<TaskList>();
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
                           ChangeNotifierProvider<TaskList>.value(
-                              value: context.read<TaskList>(),
+                              value: temp,
                               child: TaskDetailsPage(task))));
             },
             child: Container(alignment: Alignment.centerLeft, child: Text(task.code))),

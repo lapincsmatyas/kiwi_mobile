@@ -63,7 +63,9 @@ class _ConsultationListPageState extends State<ConsultationListPage> {
               ),
               body: Builder(builder: (context) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  context.read<ConsultationList>().setConsultations(snapshot.data);
+                  context
+                      .read<ConsultationList>()
+                      .setConsultations(snapshot.data);
                   switch (viewMode) {
                     case ViewMode.CALENDAR:
                       return CalendarViewComponent();
@@ -76,25 +78,31 @@ class _ConsultationListPageState extends State<ConsultationListPage> {
                   return CircularProgressIndicator();
                 }
               }),
-              floatingActionButton: FloatingActionButton(
-                  child: const Icon(Icons.add),
-                  backgroundColor: Colors.lightGreen,
-                  foregroundColor: Colors.white,
-                  onPressed: () {
-                    var taskList = context.read<TaskList>();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MultiProvider(
-                                    providers: [
-                                      ChangeNotifierProvider<
-                                              ConsultationList>.value(
-                                          value: context.read<ConsultationList>())
-                                    ],
-                                    child: ConsultationCreationPage(
-                                        taskList.tasks,
-                                        new Consultation()))));
-                  }),
+              floatingActionButton: Builder(
+                builder: (context) {
+                  return FloatingActionButton(
+                      child: const Icon(Icons.add),
+                      backgroundColor: Colors.lightGreen,
+                      foregroundColor: Colors.white,
+                      onPressed: () {
+                        var taskList = context.read<TaskList>();
+                        var consultationList = context.read<ConsultationList>();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MultiProvider(
+                                        providers: [
+                                          ChangeNotifierProvider<
+                                                  ConsultationList>.value(
+                                              value: consultationList),
+                                          ChangeNotifierProvider<TaskList>.value(
+                                              value: taskList)
+                                        ],
+                                        child: ConsultationCreationPage(
+                                            taskList.tasks, new Consultation()))));
+                      });
+                }
+              ),
             ),
           );
         });

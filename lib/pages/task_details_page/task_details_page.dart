@@ -103,7 +103,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                 return Expanded(
                                     child: Container(
                                         height: 200,
-                                        child: ConsultationListComponent()));
+                                        child: ConsultationListComponent(taskSpecific: true)));
                               } else {
                                 return CircularProgressIndicator();
                               }

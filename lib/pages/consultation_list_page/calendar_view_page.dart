@@ -16,7 +16,9 @@ class _CalendarViewComponentState extends State<CalendarViewComponent> {
 
   @override
   Widget build(BuildContext context) {
-    consultations = context.read<ConsultationList>().consultations;
+    setState(() {
+      consultations = context.read<ConsultationList>().consultations;
+    });
     return TableCalendar(
         focusedDay: DateTime.now(),
         firstDay: DateTime.utc(2010, 10, 16),
